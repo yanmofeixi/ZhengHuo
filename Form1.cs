@@ -24,6 +24,7 @@ namespace ZhengHuo
         private string break_bat = System.IO.Directory.GetCurrentDirectory() + @"\break.bat";
         private string GP;
         public static System.Timers.Timer timer = new System.Timers.Timer();
+        private static bool registered = false;
         private void Form1_Load(object sender, EventArgs e)
         {
             //初始化位置在屏幕右下角
@@ -55,14 +56,13 @@ namespace ZhengHuo
                 //获取炉石传说游戏路径
                 GP = game_path("Hearthstone");
                 //添加整活防火墙 策略
-                string ccc1 = "netsh advfirewall firewall show rule name=\"ZhengHuo\" >nul";
+/*                string ccc1 = "netsh advfirewall firewall show rule name=\"ZhengHuo\" >nul";
                 RunCmd(ccc1);
                 string ccc2 = "netsh advfirewall firewall add rule name=\"ZhengHuo\" dir=out program=\""+GP+"\" action=block enable=no >nul";
-                RunCmd(ccc2);
+                RunCmd(ccc2);*/
             }
         }
 
-        
         private void Bat_Run(string bat)
         {
             System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo("cmd.exe");
@@ -85,10 +85,17 @@ namespace ZhengHuo
             int seconds = Convert.ToInt32(textBox1.Text)+1;
             pi = seconds;
             pi_tmp = seconds;
-            
+
+            timer = new System.Timers.Timer();
             timer.Start();
+            timer.Enabled = true;
+            timer.Interval = 1000;
             //3、重连
-            timer.Elapsed += new System.Timers.ElapsedEventHandler(tok);
+            if (!registered)
+            {
+                timer.Elapsed += new System.Timers.ElapsedEventHandler(tok);
+                registered = true;
+            }
             //timer.Stop();
 
         }
@@ -162,7 +169,7 @@ namespace ZhengHuo
                 timer.Stop();
                 string ccc4 = "netsh advfirewall firewall set rule name=\"ZhengHuo\" new enable=no >nul";
                 RunCmd(ccc4);
-                MessageBox.Show("网络已恢复", "整活");
+                MessageBox.Show("网络已恢复" + pi, "整活");
             }
         }
         private void button1_Click_1(object sender, EventArgs e)
